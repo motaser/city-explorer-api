@@ -1,17 +1,43 @@
-const express = require('express') // require the express package
-const app = express() // initialize your express app instance
-const cors = require('cors');
+'use strict';
+//All requires should be on the top
+require('dotenv').config(); // npm i dotenv
+const express = require('express'); //when you require it you need to install  (npm i express)
+// const weatherData = require('./data/weather.json')
+const cors = require('cors'); //understand it more
+const axios = require('axios');
+const PORT = process.env.PORT // <=> const PORT = 3001;
+const server = express();
+server.use(cors()); //  make my server opened for anyone
+const weatherHandler = require('./modules/weather');
+const movieHandler = require('./modules/movie');
 
-app.use(cors()) // after you initialize your express app instance
-require('dotenv').config();
- 
-// a server endpoint 
-app.get('/', // our endpoint name
- function (req, res) { // callback function of what we should do with our request
-  res.send('Hello World') // our endpoint function response
+
+
+// http://localhost:3001/
+server.get('/', (req, res) => {
+    res.send('home route')
 })
- 
-app.listen(process.env.PORT,()=>{
 
-  console.log("we will start")
-}) 
+// http://localhost:3001/test
+server.get('/test', (req, res) => {
+    res.send('test')
+})
+
+
+server.get('/weather', weatherHandler)
+
+server.get('/movie', movieHandler)
+
+
+
+server.get('*', (req, res) => { // * means all, so for errors we should put it in last
+    if (res.status(400))
+        res.send('Bad Request');
+    else if (res.status(404))
+        res.send('Not Found');
+})
+
+
+server.listen(PORT, () => {
+    console.log(`Listening on PORT ${PORT}`)
+})
